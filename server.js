@@ -7,19 +7,16 @@ const bcrypt = require('bcrypt-nodejs');
 const db = knex({
     client: 'pg',
     connection: {
-      host : '127.0.0.1',
-      user : 'charlescruzan',
-      password : '',
-      database : 'faux-finance'
+      connectionString : process.env.DATABASE_URL,
+      ssl: true
     }
   });
 
-  const useremail = 'test@gmail.com';
-  const userpassword = 'test';
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
 app.get('/', (req,res)=> {
     res.send('this is working');
 })
