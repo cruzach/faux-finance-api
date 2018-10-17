@@ -4,6 +4,11 @@ const knex = require('knex');
 const cors = require('cors');
 const bcrypt = require('bcrypt-nodejs');
 
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
 const db = knex({
     client: 'pg',
     connection: {
@@ -11,11 +16,6 @@ const db = knex({
       ssl: true
     }
   });
-
-
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
 
 app.get('/', (req,res)=> {
     res.send('this is working');
