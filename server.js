@@ -16,19 +16,12 @@ const db = knex({
 
 var app = express();
 
-const corsMiddleware = cors({
-    origin: [process.env.URL, 'https://faux-finance.herokuapp.com']
-  })
-  
-  app.use(corsMiddleware)
-  app.options('*', corsMiddleware)
 
 app.use(bodyParser.json());
-
-app.all('/signin', function(req, res, next) {
+app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    next()
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
   });
 
 app.get('/', (req, res)=> {
