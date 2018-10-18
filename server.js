@@ -13,8 +13,8 @@ const db = knex({
 });
 
 var app = express();
-app.use(cors())
-app.options('*', cors()) // include before other routes
+app.use(cors({credentials: true}))
+
 app.use(bodyParser.json());
 
 app.all('/signin', function(req, res, next) {
