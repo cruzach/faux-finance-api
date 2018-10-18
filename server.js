@@ -17,7 +17,7 @@ const db = knex({
 var app = express();
 
 const corsMiddleware = cors({
-    origin: [process.env.URL, 'http://localhost:4200']
+    origin: [process.env.URL, 'https://faux-finance.herokuapp.com']
   })
   
   app.use(corsMiddleware)
