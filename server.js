@@ -12,20 +12,19 @@ const db = knex({
     }
 });
 
-
-
 var app = express();
-
+app.use(cors())
 
 app.use(bodyParser.json());
-app.use(function(req, res, next) {
+
+app.all('/signin', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next()
   });
 
 app.get('/', (req, res)=> {
-    res.send('this is working quite well');
+    res.send('this is working well');
 })
 
 app.post('/signin', (req, res) => {
