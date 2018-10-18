@@ -31,6 +31,7 @@ app.post('/signin', (req, res) => {
         if(isValid){
             return db('users').select('*').where('email','=',email)
             .then(user => {
+                console.log(user)
                 res.json(user[0])
             })
             .catch(err => res.status(400).json('unable to retrieve user'))
@@ -58,6 +59,7 @@ app.post('/register', (req, res) => {
                 email: email,
                 totalcash: 10000
             }).then(user =>{
+                console.log(user)
                 res.json(user[0]);
             })
         })
