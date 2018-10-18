@@ -7,32 +7,7 @@ const bcrypt = require('bcrypt-nodejs');
 
 const app = express();
 app.use(cors());
-app.use(function(req, res, next) {
-    var oneof = false;
-    if(req.headers.origin) {
-        res.header('Access-Control-Allow-Origin', req.headers.origin);
-        oneof = true;
-    }
-    if(req.headers['access-control-request-method']) {
-        res.header('Access-Control-Allow-Methods', req.headers['access-control-request-method']);
-        oneof = true;
-    }
-    if(req.headers['access-control-request-headers']) {
-        res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers']);
-        oneof = true;
-    }
-    if(oneof) {
-        res.header('Access-Control-Max-Age', 60 * 60 * 24 * 365);
-    }
 
-    // intercept OPTIONS method
-    if (oneof && req.method == 'OPTIONS') {
-        res.send(200);
-    }
-    else {
-        next();
-    }
-});
 app.use(bodyParser.json());
 
 const db = knex({
@@ -43,11 +18,17 @@ const db = knex({
     }
   });
 
-app.get('/', (req,res)=> {
+  app.all('/', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next()
+  });
+
+app.get('/', (req, res, next)=> {
     res.send('this is working');
 })
 
-app.post('/signin', (req,res) => {
+app.post('/signin', (req, res, next) => {
     const { email, password } = req.body;
     console.log(email,password);
     db('login').select('email','hash').where('email','=',email)
@@ -66,7 +47,7 @@ app.post('/signin', (req,res) => {
     .catch(err => res.status(400).json('Invalid credentials'))
 })
 
-app.post('/register', (req,res) => {
+app.post('/register', (req, res, next) => {
     const { email, name, password } = req.body;
     const hash = bcrypt.hashSync(password);
     db.transaction(trx =>{
@@ -92,7 +73,7 @@ app.post('/register', (req,res) => {
     .catch(err => res.status(400).json('Unable to register.'))
 })
 
-app.post('/trade', (req,res) => {
+app.post('/trade', (req, res, next) => {
     const { id, symbol, costPerShare, shareCount, transactionType, cash} = req.body;
     const currentCash = parseFloat(cash);
     const totalCost = (parseFloat(costPerShare)*parseInt(shareCount));
@@ -163,7 +144,7 @@ app.post('/trade', (req,res) => {
     }
 })
     
-app.post('/portfolio', (req,res) => {
+app.post('/portfolio', (req, res, next) => {
     const {id} = req.body;
     db('transactions').select('symbol',knex.raw('SUM(shares)'),knex.raw('AVG(costpershare)')).where({userid: id}).groupBy("symbol")
     .then(data => {
