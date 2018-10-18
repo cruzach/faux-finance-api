@@ -6,7 +6,8 @@ const bcrypt = require('bcrypt-nodejs');
 
 
 const app = express();
-app.use(cors());
+
+app.use(cors({origin:true,credentials: true}));
 
 app.use(bodyParser.json());
 
@@ -23,12 +24,6 @@ const db = knex({
 app.get('/', (req, res, next)=> {
     res.send('this is working well');
 })
-
-app.all('/', function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    next()
-});
 
 app.post('/signin', (req, res, next) => {
     const { email, password } = req.body;
