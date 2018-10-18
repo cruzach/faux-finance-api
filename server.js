@@ -1,15 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const knex = require('knex');
-const cors = require('cors');
+var cors = require('cors');
 const bcrypt = require('bcrypt-nodejs');
 
 
-const app = express();
-
-app.use(cors({origin:true,credentials: true}));
-
-app.use(bodyParser.json());
+var app = express();
 
 const db = knex({
     client: 'pg',
@@ -18,6 +14,10 @@ const db = knex({
       ssl: true
     }
   });
+app.options('*', cors()) // include before other routes
+app.use(cors({origin:true,credentials: true}));
+app.options('*', cors()) // include before other routes
+app.use(bodyParser.json());
 
 
 
