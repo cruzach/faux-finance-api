@@ -13,7 +13,7 @@ const db = knex({
 });
 
 var app = express();
-
+app.use(cors())
 app.options('*', cors()) // include before other routes
 app.use(bodyParser.json());
 
