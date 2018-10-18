@@ -4,28 +4,26 @@ const knex = require('knex');
 var cors = require('cors');
 const bcrypt = require('bcrypt-nodejs');
 
-
-var app = express();
-
 const db = knex({
     client: 'pg',
     connection: {
       connectionString : process.env.DATABASE_URL,
       ssl: true
     }
-  });
-app.options('*', cors()) // include before other routes
-app.use(cors({origin:true,credentials: true}));
+});
+
+var app = express();
+
 app.options('*', cors()) // include before other routes
 app.use(bodyParser.json());
 
 
 
-app.get('/', (req, res, next)=> {
+app.get('/', (req, res)=> {
     res.send('this is working well');
 })
 
-app.post('/signin', (req, res, next) => {
+app.post('/signin', (req, res) => {
     const { email, password } = req.body;
     console.log(email,password);
     db('login').select('email','hash').where('email','=',email)
@@ -44,7 +42,7 @@ app.post('/signin', (req, res, next) => {
     .catch(err => res.status(400).json('Invalid credentials'))
 })
 
-app.post('/register', (req, res, next) => {
+app.post('/register', (req, res) => {
     const { email, name, password } = req.body;
     const hash = bcrypt.hashSync(password);
     db.transaction(trx =>{
@@ -70,7 +68,7 @@ app.post('/register', (req, res, next) => {
     .catch(err => res.status(400).json('Unable to register.'))
 })
 
-app.post('/trade', (req, res, next) => {
+app.post('/trade', (req, res) => {
     const { id, symbol, costPerShare, shareCount, transactionType, cash} = req.body;
     const currentCash = parseFloat(cash);
     const totalCost = (parseFloat(costPerShare)*parseInt(shareCount));
@@ -141,7 +139,7 @@ app.post('/trade', (req, res, next) => {
     }
 })
     
-app.post('/portfolio', (req, res, next) => {
+app.post('/portfolio', (req, res) => {
     const {id} = req.body;
     db('transactions').select('symbol',knex.raw('SUM(shares)'),knex.raw('AVG(costpershare)')).where({userid: id}).groupBy("symbol")
     .then(data => {
