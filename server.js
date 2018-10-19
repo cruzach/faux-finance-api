@@ -13,25 +13,22 @@ const db = knex({
 });
 
 var app = express();
-app.use(cors())
 
+app.use(cors())
 app.use(bodyParser.json());
 
-
 app.get('/', (req, res)=> {
-    res.send('this is working well');
+    res.send('this is working');
 })
 
 app.post('/signin', (req, res) => {
     const { email, password } = req.body;
-    console.log(email,password);
     db('login').select('email','hash').where('email','=',email)
     .then(data => {
         const isValid = bcrypt.compareSync(password, data[0].hash);
         if(isValid){
             return db('users').select('*').where('email','=',email)
             .then(user => {
-                console.log(user)
                 res.json(user[0])
             })
             .catch(err => res.status(400).json('unable to retrieve user'))
@@ -59,7 +56,6 @@ app.post('/register', (req, res) => {
                 email: email,
                 totalcash: 10000
             }).then(user =>{
-                console.log(user)
                 res.json(user[0]);
             })
         })
@@ -74,7 +70,6 @@ app.post('/trade', (req, res) => {
     const currentCash = parseFloat(cash);
     const totalCost = (parseFloat(costPerShare)*parseInt(shareCount));
     if(transactionType === 'BUY'){
-        console.log(id,transactionType,symbol,shareCount,costPerShare);
         if(currentCash > totalCost){
             db.transaction(trx =>{
                 trx.insert({
@@ -103,13 +98,10 @@ app.post('/trade', (req, res) => {
             res.status(400).json('Insufficient funds');
         }
     } else if (transactionType === 'SELL'){
-        console.log(id,transactionType,symbol,shareCount,costPerShare, currentCash+totalCost);
         db.transaction(trx =>{
             trx('transactions').where({userid:id,symbol:symbol}).sum('shares').returning('*')
             .then(sumshares => {
-                //console.log(sumshares[0].sum);
-                //console.log(shareCount);
-                if(sumshares[0].sum>=shareCount){
+                if(sumshares[0].sum >= shareCount){
                     return trx.insert({
                         userid: id,
                         buyorsell: transactionType,
@@ -119,7 +111,6 @@ app.post('/trade', (req, res) => {
                     }).into('transactions')
                     .returning('userid')
                     .then(id => {
-                        console.log(id);
                         return trx('users')
                         .where('id','=',id[0])
                         .returning('*')
